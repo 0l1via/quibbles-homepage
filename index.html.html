@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quibbles — Home</title>
+<meta name="description" content="Quibbles home feed — communities, trending posts, and gist in every language.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#D71A28;
+    --red-dark:#A9121D;
+    --ink:#17151C;
+    --ink-soft:#6B6875;
+    --ink-faint:#9895A0;
+    --line:#E8E5EF;
+    --bg:#F5F4F9;
+    --paper:#FFFFFF;
+    --radius:12px;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:'Inter',sans-serif; color:var(--ink); background:var(--bg); -webkit-font-smoothing:antialiased; }
+  img,svg{ display:block; }
+  a{ color:inherit; text-decoration:none; }
+  ul{ list-style:none; }
+  button{ font-family:inherit; cursor:pointer; }
+  :focus-visible{ outline:3px solid var(--red); outline-offset:2px; border-radius:6px; }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
+
+  /* ---------------- Topbar ---------------- */
+  .topbar{
+    height:64px; background:var(--paper); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:20px; padding:0 20px;
+    position:sticky; top:0; z-index:40;
+  }
+  .logo{ display:flex; align-items:center; gap:2px; }
+  .q-mark{ flex:none; margin-right:-2px; }
+  .wordmark{ font-size:21px; font-weight:800; color:#1B2A6B; letter-spacing:-0.01em; display:flex; align-items:baseline; }
+  .wordmark .dot{ color:var(--red); font-size:22px; line-height:0; margin:0 0 0 -3px; transform:translateY(-8px); display:inline-block; }
+  .search{ flex:1; max-width:640px; position:relative; }
+  .search input{
+    width:100%; border:1px solid var(--line); background:var(--bg); border-radius:100px;
+    padding:10px 16px 10px 40px; font-size:14px; color:var(--ink);
+  }
+  .search input:focus{ outline:none; border-color:var(--red); background:#fff; }
+  .search svg{ position:absolute; left:14px; top:50%; transform:translateY(-50%); }
+  .auth{ display:flex; gap:10px; margin-left:auto; flex:none; }
+  .btn{ font-size:14px; font-weight:600; padding:9px 18px; border-radius:100px; border:1px solid var(--line); background:#fff; }
+  .btn.primary{ background:var(--red); border-color:var(--red); color:#fff; }
+  .btn.primary:hover{ background:var(--red-dark); }
+  .btn.ghost:hover{ border-color:var(--red); color:var(--red); }
+  .menu-btn{ display:none; border:0; background:none; padding:6px; }
+  .menu-btn span{ display:block; width:20px; height:2px; background:var(--ink); margin:4px 0; }
+
+  /* ---------------- Layout ---------------- */
+  .layout{ display:grid; grid-template-columns:250px 1fr 300px; gap:20px; max-width:1360px; margin:0 auto; padding:20px; align-items:start; }
+
+  /* ---------------- Sidebar ---------------- */
+  .sidebar{ position:sticky; top:84px; display:flex; flex-direction:column; gap:22px; }
+  .nav-list li a{
+    display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px;
+    font-size:14.5px; font-weight:600; color:var(--ink-soft);
+  }
+  .nav-list li a svg{ flex:none; }
+  .nav-list li a:hover{ background:#fff; color:var(--ink); }
+  .nav-list li.active a{ background:#FDECEE; color:var(--red); }
+  .nav-list li.active a svg{ stroke:var(--red); }
+
+  .side-head{ display:flex; align-items:center; justify-content:space-between; padding:0 12px; margin-bottom:10px; }
+  .side-head h4{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); font-weight:800; }
+  .create-btn{ font-size:12.5px; font-weight:700; color:#fff; padding:6px 16px; border-radius:100px; background:var(--red); border:none; }
+  .create-btn:hover{ background:var(--red-dark); }
+
+  .community-list li a{ display:flex; align-items:center; gap:12px; padding:8px 12px; border-radius:10px; font-size:14.5px; font-weight:600; color:var(--ink); }
+  .community-list li a:hover{ background:#fff; }
+  .c-dot{ width:30px; height:30px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; }
+
+  .general-list li a{ display:flex; align-items:center; gap:12px; padding:8px 12px; border-radius:10px; font-size:14px; font-weight:600; color:var(--ink-soft); }
+  .general-list li a:hover{ background:#fff; color:var(--ink); }
+  .general-list .g-ic{ width:28px; height:28px; flex:none; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+  .general-list .g-ic.badge{ background:var(--ink); color:#fff; }
+  .general-list .g-ic.badge.red{ background:var(--red); }
+  .general-list .version-row a{ color:var(--ink-faint); font-weight:500; }
+
+  .social-row{ display:flex; gap:12px; padding:10px 12px 0; }
+  .social-row a{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); }
+  .social-row a:hover{ background:var(--bg); }
+
+  /* ---------------- Feed / tabs ---------------- */
+  .feed-head{ background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin-bottom:16px; }
+  .tab-row{ display:flex; flex-wrap:wrap; gap:10px; }
+  .tab-row + .tab-row{ margin-top:10px; }
+  .pill{ font-size:13.5px; font-weight:600; padding:9px 18px; border-radius:100px; background:var(--bg); color:var(--ink-soft); border:1px solid transparent; }
+  .pill:hover{ color:var(--ink); }
+  .pill.active{ background:var(--red); color:#fff; }
+
+  .posts{ display:flex; flex-direction:column; gap:14px; }
+  .post{ background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:18px; display:flex; gap:14px; }
+  .vote{ flex:none; width:34px; display:flex; flex-direction:column; align-items:center; gap:2px; padding-top:2px; }
+  .vote button{ background:none; border:0; padding:5px; border-radius:6px; color:var(--ink-faint); }
+  .vote button:hover{ background:#FDECEE; color:var(--red); }
+
+  .post-body{ flex:1; min-width:0; }
+  .post-meta{ display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12.5px; color:var(--ink-faint); flex-wrap:wrap; }
+  .cat-chip{ display:flex; align-items:center; gap:6px; font-weight:700; color:var(--red); }
+  .cat-chip .dot-ic{ width:20px; height:20px; border-radius:50%; background:#FDECEE; display:flex; align-items:center; justify-content:center; font-size:11px; }
+  .post h3{ font-size:16.5px; font-weight:800; margin-bottom:6px; line-height:1.35; }
+  .post p{ font-size:14px; color:var(--ink-soft); line-height:1.55; margin-bottom:12px; }
+  .post-actions{ display:flex; gap:20px; font-size:13px; color:var(--ink-faint); font-weight:600; }
+  .post-actions span{ display:flex; align-items:center; gap:6px; }
+  .post-actions span:hover{ color:var(--red); }
+
+  /* ---------------- Right rail ---------------- */
+  .rightbar{ position:sticky; top:84px; display:flex; flex-direction:column; gap:18px; }
+  .ad-box{
+    background:var(--paper); border:1px dashed var(--line); border-radius:var(--radius);
+    height:250px; display:flex; align-items:center; justify-content:center;
+    color:var(--ink-faint); font-size:13px; font-weight:600;
+  }
+  .rec-head{ font-size:13px; font-weight:800; margin-bottom:2px; }
+  .rec-card{ background:var(--paper); border:1px solid var(--line); border-radius:var(--radius); padding:14px; }
+  .rec-top{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .rec-top .c-dot{ width:24px; height:24px; }
+  .rec-name{ font-size:13px; font-weight:700; }
+  .rec-time{ font-size:11.5px; color:var(--ink-faint); margin-left:auto; }
+  .rec-title{ font-size:14px; font-weight:700; margin-bottom:8px; line-height:1.4; }
+  .rec-stats{ display:flex; gap:14px; font-size:12px; color:var(--ink-faint); font-weight:600; }
+  .rec-stats span{ display:flex; align-items:center; gap:5px; }
+
+  /* ---------------- Mobile bottom nav (matches the app) ---------------- */
+  .mobile-nav{ display:none; }
+
+  /* ---------------- Responsive ---------------- */
+  @media (max-width: 1080px){
+    .layout{ grid-template-columns:220px 1fr; }
+    .rightbar{ display:none; }
+  }
+  @media (max-width: 760px){
+    .menu-btn{ display:block; }
+    .layout{ grid-template-columns:1fr; padding:14px; padding-bottom:80px; }
+    .sidebar{
+      position:fixed; top:64px; left:0; bottom:0; width:250px; background:#fff;
+      border-right:1px solid var(--line); padding:18px; overflow-y:auto;
+      transform:translateX(-100%); transition:transform .2s ease; z-index:39;
+    }
+    .sidebar.open{ transform:translateX(0); box-shadow:20px 0 40px rgba(0,0,0,.12); }
+    .auth{ display:none; }
+    .post{ flex-direction:column; }
+    .vote{ flex-direction:row; width:auto; }
+
+    .mobile-nav{
+      display:flex; position:fixed; bottom:0; left:0; right:0; height:62px; background:#fff;
+      border-top:1px solid var(--line); z-index:40; align-items:center; justify-content:space-around;
+    }
+    .mobile-nav a{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600; color:var(--ink-faint); }
+    .mobile-nav a.active{ color:var(--red); }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
+  <a href="#" class="logo" aria-label="Quibbles home">
+    <span class="q-mark">
+      <svg width="32" height="32" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="9.4" fill="none" stroke="#1B2A6B" stroke-width="3.2"/>
+        <circle cx="11" cy="11" r="5.6" fill="#fff" stroke="#D71A28" stroke-width="1.3"/>
+        <circle cx="8.7" cy="9.8" r="0.85" fill="#D71A28"/>
+        <circle cx="13.3" cy="9.8" r="0.85" fill="#D71A28"/>
+        <path d="M8.6 12.6c1 .9 2.8.9 3.8 0" stroke="#D71A28" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <line x1="17.3" y1="17.3" x2="21.4" y2="21.4" stroke="#1B2A6B" stroke-width="3.2" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="wordmark"><span class="dot">•</span>uibbles</span>
+  </a>
+  <div class="search">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9895A0" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" placeholder="Search Quibbles">
+  </div>
+  <div class="auth">
+    <button class="btn ghost">Log In</button>
+    <button class="btn primary">Sign Up</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <ul class="nav-list">
+      <li class="active"><a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</a></li>
+      <li><a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Latest</a></li>
+      <li><a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>Trending</a></li>
+      <li><a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 9 9 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 1 1 21 11.5Z"/></svg>Chat</a></li>
+      <li><a href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Create New Post</a></li>
+    </ul>
+
+    <div>
+      <div class="side-head">
+        <h4>Communities</h4>
+        <button class="create-btn">Create</button>
+      </div>
+      <ul class="community-list">
+        <li><a href="#"><span class="c-dot" style="background:#B98FE0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M17 20v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1"/><circle cx="9" cy="7" r="4"/><path d="M23 20v-1a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>All Communities</a></li>
+        <li><a href="#"><span class="c-dot" style="background:#F0847A;">✂️</span>Technology</a></li>
+        <li><a href="#"><span class="c-dot" style="background:#C9A3EA;">🏆</span>QuibblesRewardsHub</a></li>
+        <li><a href="#"><span class="c-dot" style="background:#D6DC5C;">📰</span>programming</a></li>
+        <li><a href="#"><span class="c-dot" style="background:#F0954C;">🔑</span>Quibbles-digital-skills-program</a></li>
+        <li><a href="#"><span class="c-dot" style="background:#5AC8FA;">✏️</span>Software-devs</a></li>
+        <li><a href="#"><span class="c-dot" style="background:#7B86E0;">📁</span>interaction</a></li>
+        <li><a href="#"><span class="c-dot" style="background:#F0847A;">💧</span>NEWS</a></li>
+        <li><a href="#"><span class="c-dot" style="background:#C9A3EA;">❄️</span>gist_corner</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="side-head"><h4>General</h4></div>
+      <ul class="general-list">
+        <li><a href="#"><span class="g-ic badge red">🎬</span>Creator Studio</a></li>
+        <li><a href="#"><span class="g-ic badge">ⓘ</span>About Quibbles</a></li>
+        <li><a href="#"><span class="g-ic">📢</span>Advertise</a></li>
+        <li><a href="#"><span class="g-ic">⭐</span>Request Feature</a></li>
+        <li><a href="#"><span class="g-ic badge">?</span>Help</a></li>
+        <li><a href="#"><span class="g-ic">🐞</span>Report Bug</a></li>
+        <li class="version-row"><a href="#">&lt;/&gt; Version 1.6.4</a></li>
+      </ul>
+      <div class="social-row">
+        <a href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink-soft)" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+        <a href="#" aria-label="Twitter / X"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-soft)" stroke-width="1.8"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C4 15.6 2 12.8 2 9.5c1.7 1 3.6 1.6 5.6 1.5C4.9 8.8 4.1 4.8 6 2c2.6 3.2 6.5 5.3 10.7 5.5-.4-1.8.1-3.6 1.5-4.8 1.7-1.5 4.3-1.4 5.9.2-.9.2-1.8.6-2.6 1.2.9-.1 1.7-.3 2.5-.7-.6.9-1.3 1.7-2 2.4Z"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-soft)" stroke-width="1.8"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4V8h4v1.5A6 6 0 0 1 16 8Z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Feed -->
+  <main>
+    <div class="feed-head">
+      <div class="tab-row">
+        <button class="pill active">Latest Posts</button>
+        <button class="pill">Interactions</button>
+        <button class="pill">Entertainment</button>
+        <button class="pill">NEWS</button>
+        <button class="pill">Jobs</button>
+      </div>
+      <div class="tab-row">
+        <button class="pill">Education</button>
+        <button class="pill">Sports</button>
+        <button class="pill">gist_Corner</button>
+        <button class="pill">world_cup</button>
+        <button class="pill">Health</button>
+      </div>
+    </div>
+
+    <div class="posts">
+
+      <article class="post">
+        <div class="vote">
+          <button aria-label="Upvote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m18 15-6-6-6 6"/></svg></button>
+          <button aria-label="Downvote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+        <div class="post-body">
+          <div class="post-meta">
+            <span class="cat-chip"><span class="dot-ic">🗣️</span>Language</span>
+            <span>Posted by khalidd · 9 hrs ago</span>
+          </div>
+          <h3>Language Contest Open</h3>
+          <p>Write a story in any Nigerian language — English, Yoruba, Igbo, Hausa or Pidgin — and stand a chance to win. Winners announced every Sunday.</p>
+          <div class="post-actions">
+            <span>▲ 26 votes</span><span>💬 13 Comments</span><span>↗ Share</span><span>🚩 Report</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="post">
+        <div class="vote">
+          <button aria-label="Upvote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m18 15-6-6-6 6"/></svg></button>
+          <button aria-label="Downvote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+        <div class="post-body">
+          <div class="post-meta">
+            <span class="cat-chip"><span class="dot-ic">🍲</span>gist_Corner</span>
+            <span>Posted by ada_cooks · 2 hrs ago</span>
+          </div>
+          <h3>Jollof rice debate: does the pot matter more than the recipe?</h3>
+          <p>Some people swear it's all in the clay pot, others say any pot will do if the base is right. Where do you stand?</p>
+          <div class="post-actions">
+            <span>▲ 412 votes</span><span>💬 88 Comments</span><span>↗ Share</span><span>🚩 Report</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="post">
+        <div class="vote">
+          <button aria-label="Upvote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m18 15-6-6-6 6"/></svg></button>
+          <button aria-label="Downvote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+        <div class="post-body">
+          <div class="post-meta">
+            <span class="cat-chip"><span class="dot-ic">💻</span>Programming</span>
+            <span>Posted by Meerah01 · 13 hrs ago</span>
+          </div>
+          <h3>Fastest Finger Tonight — quickfire coding round</h3>
+          <p>Drop your fastest solution to tonight's problem in the comments. Bonus points if it runs in one pass.</p>
+          <div class="post-actions">
+            <span>▲ 60 votes</span><span>💬 246 Comments</span><span>↗ Share</span><span>🚩 Report</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="post">
+        <div class="vote">
+          <button aria-label="Upvote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m18 15-6-6-6 6"/></svg></button>
+          <button aria-label="Downvote"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+        <div class="post-body">
+          <div class="post-meta">
+            <span class="cat-chip"><span class="dot-ic">📚</span>Education</span>
+            <span>Posted by book_ade · 5 hrs ago</span>
+          </div>
+          <h3>Weekend reading circle: drop your current book below</h3>
+          <p>Looking for the next group read. Currently three chapters into something good — comment what's on your shelf.</p>
+          <div class="post-actions">
+            <span>▲ 96 votes</span><span>💬 21 Comments</span><span>↗ Share</span><span>🚩 Report</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- Right rail -->
+  <aside class="rightbar">
+    <div class="ad-box">Advertisement Space</div>
+    <div>
+      <div class="rec-head">Recommended Posts</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-top">
+        <span class="c-dot" style="background:#E4F6DE;">💻</span>
+        <span class="rec-name">q/Programming</span>
+        <span class="rec-time">17 hours ago</span>
+      </div>
+      <div class="rec-title">Fastest Finger Tonight</div>
+      <div class="rec-stats"><span>▲ 60 votes</span><span>💬 246 comments</span></div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-top">
+        <span class="c-dot" style="background:#FFE3E6;">😂</span>
+        <span class="rec-name">q/Comedy</span>
+        <span class="rec-time">3 hours ago</span>
+      </div>
+      <div class="rec-title">Caption this one if you dare</div>
+      <div class="rec-stats"><span>▲ 214 votes</span><span>💬 58 comments</span></div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- Mobile bottom nav — mirrors the Quibbles app -->
+<nav class="mobile-nav">
+  <a href="#" class="active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</a>
+  <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>Trending</a>
+  <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Latest</a>
+  <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 9 9 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 1 1 21 11.5Z"/></svg>Chat</a>
+  <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</a>
+</nav>
+
+<script>
+  const menuBtn = document.getElementById('menuBtn');
+  const sidebar = document.getElementById('sidebar');
+  menuBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+  document.addEventListener('click', (e) => {
+    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) sidebar.classList.remove('open');
+  });
+</script>
+
+</body>
+</html>
